@@ -1,2 +1,2 @@
-![Screenshot (7)](https://user-images.githubusercontent.com/42654690/100673971-50c49380-335c-11eb-8218-8b9d17faf41d.png)
+![Screenshot (7)](https://user-images.githubusercontent.com/42654690/102978892-29955800-44fd-11eb-84ff-31f6810ccebb.png)
 link to website: https://awesomeplayer.netlify.app
