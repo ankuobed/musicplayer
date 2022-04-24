@@ -1,0 +1,67 @@
+.image {
+    height: 250px;
+    margin: 30px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 1px 1px 30px lightgray;
+    border-radius: 10px;
+    transition: transform 500ms ease;
+    background: #fafafa;
+  }
+  
+  .scale {
+    transform: scale(1.07);
+  }
+  
+  .image .MuiSvgIcon-root {
+    font-size: 160px;
+    color: #555555;
+  
+  }
+  
+  .title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 18px;
+  }
+  
+  .author {
+    font-size: 13px;
+    margin: 0;
+    color: #f50057;
+    margin-bottom: 30px;
+  }
+  
+  .time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    padding: 10px;
+  }
+  
+  .controls .MuiSvgIcon-root {
+    font-size: 40px;
+  }
+  
+  .controls .play {
+    background-color: #f50057;
+    border-radius: 50%;
+    box-shadow: 1px 1px 30px rgb(190, 190, 190);
+  }
+  
+  .controls .play .MuiSvgIcon-root {
+    color: white;
+  }
+  
+  @media(min-width: 600px) {
+    .image {
+      height: 350px;
+    }
+  }
