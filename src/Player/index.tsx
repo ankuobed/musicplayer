@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useMemo } from 'react';
 import './style.css';
 import { 
   PlayArrowRounded, 
@@ -7,88 +7,97 @@ import {
   SkipNextRounded, 
   MusicNote
 } from '@material-ui/icons'
-import songs from '../data'
+import { Howl } from 'howler'
 import { IconButton, Slider } from '@material-ui/core'
 import { formatTime } from '../utils'
 
- let currentIndex = 0
+interface Props {
+  sources: string[];
+}
 
-const Player = () => {
-  const audioRef = useRef<HTMLAudioElement>({} as HTMLAudioElement)
+const Player: React.FC<Props> = ({ sources }) => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentSong, setCurrentSong] = useState(songs[currentIndex])
-  const [time, setTime] = useState<number>()
+  const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [slideValue, setSlideValue] = useState<number>()
 
-  useEffect(() => {
-    audioRef.current.volume = 0.5
-  }, [])
+  const [currentIndex, setCurrentIndex] = useState(0)
 
-  useEffect(() => {
-    if(isPlaying) {
-      audioRef.current.play()
-    } else {
-      audioRef.current.pause()
-    }
-
-    setInterval(() => {
-      // bad practice but can't think of any other way
-      setSlideValue(audioRef.current.currentTime)
-      setTime(Math.round(audioRef.current.currentTime))
-      setDuration(Math.round(audioRef.current.duration))
-
-      if(audioRef.current.ended) {
+  const audio = useMemo(() => {
+    return new Howl({
+      src: sources[currentIndex],
+      volume: 0.4,
+      format: 'mp3',
+      onplay: () => {
+        setIsPlaying(true)
+        setTime(audio.seek())
+        setInterval(() => {
+          setTime(audio.seek())
+        }, 1000)
+      },
+      onpause: () => {
+        setIsPlaying(false)
+      },
+      onend: () => {
         handleNext()
-      }
-    }, 100)
-  })
-      
+      },
+      onseek: () => {
+        setTime(audio.seek())
+      },
+      onload: () => {
+        setDuration(audio.duration())
+        if(isPlaying) {
+          audio.play()
+        }
+      },
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, sources])
 
-  const handleNext = () => {
-    if(currentIndex < songs.length - 1) {
-      ++currentIndex
-      setCurrentSong(songs[currentIndex])
+  const handleSeek = (_: ChangeEvent<{}>, value: number | number[]) => {
+    if(!Array.isArray(value)) {
+      audio.seek(value)
     }
   }
 
   const handlePrevious = () => {
     if(currentIndex > 0) {
-      --currentIndex
-      setCurrentSong(songs[currentIndex])
+      audio.unload()
+      setCurrentIndex(index => index - 1)
+    } else {
+      audio.seek(0)
     }
   }
 
-  const handleSlideChange = (_: ChangeEvent<{}>, value: number | number[]) => {
-    if(!Array.isArray(value)) {
-      audioRef.current.currentTime = value
+  const handleNext = () => {
+    if(currentIndex < sources.length - 1) {
+      audio.unload()
+      setCurrentIndex(index => index + 1)
+    } else {
+      setCurrentIndex(0)
     }
   }
 
   return (
     <div className="container">
-
-      <audio ref={audioRef} src={currentSong.file}></audio>
-
       <div className={`image ${isPlaying && 'scale'}`}>
         <MusicNote />
       </div>
 
-      <p className='title'>{currentSong.title}</p>
-      <p className='author'>{currentSong.author}</p>
+      <p className='title'>Title</p>
+      <p className='author'>Artiste</p>
 
       <Slider
         color='secondary'
-        value={slideValue}
+        value={time}
         min={0}
         step={1}
         max={duration}
-        onChange={handleSlideChange}
+        onChange={handleSeek}
       />
 
       <div className='time'>
         <span>{formatTime(time as number)}</span>
-        <span>{duration&& formatTime(duration)}</span>
+        <span>{formatTime(duration)}</span>
       </div>
 
       <div className='controls'>
@@ -99,10 +108,10 @@ const Player = () => {
         <div className='play'>
           {
             isPlaying? 
-            <IconButton onClick={() => setIsPlaying(false)}>
+            <IconButton onClick={() => audio.pause()}>
               <PauseRounded />
             </IconButton> :
-            <IconButton onClick={() => setIsPlaying(true)}>
+            <IconButton onClick={() => audio.play()}>
               <PlayArrowRounded />
             </IconButton>
           }

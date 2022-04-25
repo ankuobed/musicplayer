@@ -4,7 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 1px 1px 30px lightgray;
+    box-shadow: 1px 1px 30px #dbdbdb;
     border-radius: 10px;
     transition: transform 500ms ease;
     background: #fafafa;
@@ -17,7 +17,6 @@
   .image .MuiSvgIcon-root {
     font-size: 160px;
     color: #555555;
-  
   }
   
   .title {

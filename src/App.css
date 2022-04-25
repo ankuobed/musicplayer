@@ -1,6 +1,9 @@
 .App {
   padding-top: 30px;
   font-family: montserrat;
+}
+
+body {
   background-color: whitesmoke;
 }
 
