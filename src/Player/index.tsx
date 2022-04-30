@@ -10,27 +10,35 @@ import {
 import { Howl } from 'howler'
 import { IconButton, Slider } from '@material-ui/core'
 import { formatTime } from '../utils'
+import { Song } from '../types';
 
 interface Props {
-  sources: string[];
+  song: Song;
+  onPrevious: () => void;
+  onNext: () => void;
 }
 
-const Player: React.FC<Props> = ({ sources }) => {
+let interval: NodeJS.Timeout
+let audio: Howl
+
+const Player: React.FC<Props> = ({ song, onPrevious, onNext }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
 
-  const [currentIndex, setCurrentIndex] = useState(0)
+  audio = useMemo(() => {
+    // remove the currrently playing audio before loading a new one
+    audio?.unload()
+    clearInterval(interval)
 
-  const audio = useMemo(() => {
     return new Howl({
-      src: sources[currentIndex],
+      src: song.src,
       volume: 0.4,
       format: 'mp3',
       onplay: () => {
         setIsPlaying(true)
         setTime(audio.seek())
-        setInterval(() => {
+        interval = setInterval(() => {
           setTime(audio.seek())
         }, 1000)
       },
@@ -38,7 +46,7 @@ const Player: React.FC<Props> = ({ sources }) => {
         setIsPlaying(false)
       },
       onend: () => {
-        handleNext()
+        onNext()
       },
       onseek: () => {
         setTime(audio.seek())
@@ -48,10 +56,10 @@ const Player: React.FC<Props> = ({ sources }) => {
         if(isPlaying) {
           audio.play()
         }
-      },
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, sources])
+  }, [song])
 
   const handleSeek = (_: ChangeEvent<{}>, value: number | number[]) => {
     if(!Array.isArray(value)) {
@@ -59,32 +67,18 @@ const Player: React.FC<Props> = ({ sources }) => {
     }
   }
 
-  const handlePrevious = () => {
-    if(currentIndex > 0) {
-      audio.unload()
-      setCurrentIndex(index => index - 1)
-    } else {
-      audio.seek(0)
-    }
-  }
-
-  const handleNext = () => {
-    if(currentIndex < sources.length - 1) {
-      audio.unload()
-      setCurrentIndex(index => index + 1)
-    } else {
-      setCurrentIndex(0)
-    }
-  }
-
   return (
     <div className="container">
-      <div className={`image ${isPlaying && 'scale'}`}>
-        <MusicNote />
+      <div className={`cover ${isPlaying && 'scale'}`}>
+        {
+          song.image ?
+          <img src={song.image} alt={song.title} /> :
+          <MusicNote />
+        }
       </div>
 
-      <p className='title'>Title</p>
-      <p className='author'>Artiste</p>
+      <p className='title'>{ song.title }</p>
+      <p className='artist'>{ song.artist }</p>
 
       <Slider
         color='secondary'
@@ -101,7 +95,7 @@ const Player: React.FC<Props> = ({ sources }) => {
       </div>
 
       <div className='controls'>
-        <IconButton onClick={handlePrevious}>
+        <IconButton onClick={() => onPrevious()}>
           <SkipPreviousRounded />
         </IconButton>
 
@@ -117,7 +111,7 @@ const Player: React.FC<Props> = ({ sources }) => {
           }
         </div>
 
-        <IconButton onClick={handleNext}>
+        <IconButton onClick={() => onNext()}>
           <SkipNextRounded />
         </IconButton>
       </div>

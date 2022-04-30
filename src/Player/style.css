@@ -1,4 +1,4 @@
-.image {
+.cover {
     height: 250px;
     margin: 30px 0;
     display: flex;
@@ -11,12 +11,19 @@
   }
   
   .scale {
-    transform: scale(1.07);
+    transform: scale(1.05);
   }
   
-  .image .MuiSvgIcon-root {
+  .cover .MuiSvgIcon-root {
     font-size: 160px;
     color: #555555;
+  }
+
+  .cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px;
   }
   
   .title {
@@ -25,8 +32,8 @@
     font-size: 18px;
   }
   
-  .author {
-    font-size: 13px;
+  .artist {
+    font-size: 14px;
     margin: 0;
     color: #f50057;
     margin-bottom: 30px;
@@ -60,7 +67,7 @@
   }
   
   @media(min-width: 600px) {
-    .image {
+    .cover {
       height: 350px;
     }
   }
